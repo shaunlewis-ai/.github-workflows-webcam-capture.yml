@@ -1,0 +1,27 @@
+name: Webcam Capture
+on:
+  schedule:
+    - cron: '* * * * *'  # Every minute
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: pip install requests
+      
+    - name: Capture webcam
+      run: python webcam_capture.py
+      
+    - name: Upload to Google Drive
+      env:
+        GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
+      run: python upload_to_drive.py
