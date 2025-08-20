@@ -3,10 +3,7 @@ name: Webcam Capture to Dropbox
 on:
   workflow_dispatch:
   schedule:
-  on:
-  workflow_dispatch:
-  schedule:
-     - cron: "*/5 * * * *"  #  Every 5 minutes (in UTC)
+    - cron: "*/5 * * * *"  # Every 5 minutes (in UTC)
 
 jobs:
   capture:
@@ -14,15 +11,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-          
+
       - name: Install dependencies
         run: pip install requests
-        
+
       - name: Debug secrets
         run: |
           echo "Checking if secret exists..."
@@ -31,7 +28,7 @@ jobs:
           else
             echo "Secret missing"
           fi
-          
+
       - name: Run capture
         env:
           DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
