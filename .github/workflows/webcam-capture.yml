@@ -3,7 +3,7 @@ name: Webcam Capture to Dropbox
 on:
   workflow_dispatch:
   schedule:
-  - cron: '* * * * *'  # Every minute
+  - cron: '*/10 * * * *'  # Every minute
 
 jobs:
   capture:
