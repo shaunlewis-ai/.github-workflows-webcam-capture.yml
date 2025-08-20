@@ -1,54 +1,35 @@
 name: Webcam Capture to Dropbox
+
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '* * * * *'  # Every minute
-  workflow_dispatch:  # Manual trigger
+    - cron: '*/5 * * * *'
 
 jobs:
   capture:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-      
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
+      - name: Checkout repository
+        uses: actions/checkout@v3
         
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install requests
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Install dependencies
+        run: pip install requests
         
-    - name: Debug - Check GitHub secrets
-      run: |
-        echo "Checking GitHub secrets..."
-        if [ -z "${{ secrets.DROPBOX_ACCESS_TOKEN }}" ]; then
-          echo "ERROR: GitHub secret DROPBOX_ACCESS_TOKEN is empty"
-        else
-          echo "SUCCESS: GitHub secret exists (length: ${{ length(secrets.DROPBOX_ACCESS_TOKEN) }})"
-          echo "First 10 chars: ${{ substr(secrets.DROPBOX_ACCESS_TOKEN, 0, 10) }}"
-        fi
-        
-    - name: Debug - Check environment in step
-      env:
-        DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
-      run: |
-        echo "Checking environment variable in this step..."
-        if [ -z "$DROPBOX_ACCESS_TOKEN" ]; then
-          echo "ERROR: Environment variable DROPBOX_ACCESS_TOKEN is empty"
-        else
-          echo "SUCCESS: Environment variable exists (length: ${#DROPBOX_ACCESS_TOKEN})"
-          echo "First 10 chars: ${DROPBOX_ACCESS_TOKEN:0:10}"
-        fi
-        
-    - name: Capture webcam and upload to Dropbox
-      env:
-        DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
-      run: |
-        echo "Environment check before Python:"
-        echo "DROPBOX_ACCESS_TOKEN length: ${#DROPBOX_ACCESS_TOKEN}"
-        echo "Starting webcam capture with Dropbox upload..."
-        python webcam_capture.py
-        echo "Webcam capture completed"
+      - name: Debug secrets
+        run: |
+          echo "Checking if secret exists..."
+          if [ -n "${{ secrets.DROPBOX_ACCESS_TOKEN }}" ]; then
+            echo "Secret exists"
+          else
+            echo "Secret missing"
+          fi
+          
+      - name: Run capture
+        env:
+          DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
+        run: python webcam_capture.py
