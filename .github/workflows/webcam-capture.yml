@@ -6,7 +6,7 @@ on:
   on:
   workflow_dispatch:
   schedule:
-    - cron: "*/5 * * * *"  #  Every 5 minutes (in UTC)
+     - cron: "*/5 * * * *"  #  Every 5 minutes (in UTC)
 
 jobs:
   capture:
