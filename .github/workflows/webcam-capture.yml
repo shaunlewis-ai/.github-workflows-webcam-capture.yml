@@ -1,7 +1,7 @@
-name: Webcam Capture
+name: Webcam Capture to Dropbox
 on:
   schedule:
-    - cron: '*/1 * * * *'  # Every minute
+    - cron: '* * * * *'  # Every minute
   workflow_dispatch:  # Manual trigger
 
 jobs:
@@ -21,8 +21,34 @@ jobs:
         python -m pip install --upgrade pip
         pip install requests
         
-    - name: Capture webcam
+    - name: Debug - Check GitHub secrets
       run: |
-        echo "Starting webcam capture..."
+        echo "Checking GitHub secrets..."
+        if [ -z "${{ secrets.DROPBOX_ACCESS_TOKEN }}" ]; then
+          echo "ERROR: GitHub secret DROPBOX_ACCESS_TOKEN is empty"
+        else
+          echo "SUCCESS: GitHub secret exists (length: ${{ length(secrets.DROPBOX_ACCESS_TOKEN) }})"
+          echo "First 10 chars: ${{ substr(secrets.DROPBOX_ACCESS_TOKEN, 0, 10) }}"
+        fi
+        
+    - name: Debug - Check environment in step
+      env:
+        DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
+      run: |
+        echo "Checking environment variable in this step..."
+        if [ -z "$DROPBOX_ACCESS_TOKEN" ]; then
+          echo "ERROR: Environment variable DROPBOX_ACCESS_TOKEN is empty"
+        else
+          echo "SUCCESS: Environment variable exists (length: ${#DROPBOX_ACCESS_TOKEN})"
+          echo "First 10 chars: ${DROPBOX_ACCESS_TOKEN:0:10}"
+        fi
+        
+    - name: Capture webcam and upload to Dropbox
+      env:
+        DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
+      run: |
+        echo "Environment check before Python:"
+        echo "DROPBOX_ACCESS_TOKEN length: ${#DROPBOX_ACCESS_TOKEN}"
+        echo "Starting webcam capture with Dropbox upload..."
         python webcam_capture.py
         echo "Webcam capture completed"
