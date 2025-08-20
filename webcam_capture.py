@@ -27,21 +27,9 @@ def debug_environment():
     if token:
         print(f"Token length: {len(token)}")
         print(f"Token starts with: {token[:10]}...")
-        print(f"Token type: {type(token)}")
     else:
         print("❌ Token is None or empty")
         
-    # Show all environment variables that contain 'DROPBOX'
-    dropbox_vars = {k: v for k, v in os.environ.items() if 'DROPBOX' in k.upper()}
-    print(f"Environment variables containing 'DROPBOX': {list(dropbox_vars.keys())}")
-    
-    # Show all environment variables (first 10 chars of values for security)
-    print("All environment variables:")
-    for key in sorted(os.environ.keys()):
-        value = os.environ[key]
-        display_value = value[:10] + "..." if len(value) > 10 else value
-        print(f"  {key}: {display_value}")
-    
     print("-" * 40)
 
 def upload_to_dropbox(image_data, filename):
@@ -54,11 +42,6 @@ def upload_to_dropbox(image_data, filename):
         
         if not access_token:
             print("❌ Dropbox access token not found")
-            
-            # Try alternative ways to get the token
-            alt_token = os.getenv('DROPBOX_ACCESS_TOKEN')
-            print(f"Alternative os.getenv result: {alt_token is not None}")
-            
             return False
         
         print(f"✅ Token found, length: {len(access_token)}")
@@ -85,18 +68,5 @@ def upload_to_dropbox(image_data, filename):
         if response.status_code == 200:
             result = response.json()
             print(f"✅ Uploaded to Dropbox: {filename}")
-            print(f"📁 App folder path: {result.get('path_display')}")
-            print(f"📏 Size: {result.get('size')} bytes")
-            return True
-        else:
-            print(f"❌ Dropbox upload failed: {response.status_code}")
-            print(f"Response: {response.text}")
-            return False
-            
-    except Exception as e:
-        print(f"❌ Dropbox upload error: {e}")
-        return False
-
-def fetch_and_save_image():
-    timestamp = datetime.now()
-    filename = f"hidden-lake-{timestamp.st
+            print(f"📁 Path: {result.get('path_display')}")
+            print(f"📏 Size: {result.get('size')}
